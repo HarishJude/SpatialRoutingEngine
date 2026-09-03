@@ -7,6 +7,7 @@ import com.routing.spatial_routing_engine.service.GraphService;
 import com.routing.spatial_routing_engine.service.RoutingService;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.Map;
 
 @RestController
@@ -30,5 +31,11 @@ public class RoutingController {
     public DijkstraResult runDijkstra(@RequestParam String from, @RequestParam String to) {
         Graph graph = graphService.buildToyGraph();
         return routingService.dijkstra(graph, from, to);
+    }
+
+    @GetMapping("/astar")
+    public DijkstraResult runAStar(@RequestParam String from, @RequestParam String to) {
+        Graph graph = graphService.buildToyGraph();
+        return routingService.aStar(graph, from, to);
     }
 }
