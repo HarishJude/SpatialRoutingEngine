@@ -112,4 +112,23 @@ public class RoutingService {
     private double heuristic(Node a, Node b) {
         return HaversineUtil.distance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude());
     }
+
+    public List<BenchmarkResult> benchmark(Graph graph, String sourceId, String targetId) {
+        List<BenchmarkResult> results = new ArrayList<>();
+
+        long startDijkstra = System.nanoTime();
+        DijkstraResult dijkstraResult = dijkstra(graph, sourceId, targetId);
+        long dijkstraTime = System.nanoTime() - startDijkstra;
+
+        long startAStar = System.nanoTime();
+        DijkstraResult aStarResult = aStar(graph, sourceId, targetId);
+        long aStarTime = System.nanoTime() - startAStar;
+
+        results.add(new BenchmarkResult("Dijkstra", dijkstraTime, dijkstraResult.getNodesExplored(),
+                dijkstraResult.getTotalCost(), dijkstraResult.getPath()));
+        results.add(new BenchmarkResult("A*", aStarTime, aStarResult.getNodesExplored(),
+                aStarResult.getTotalCost(), aStarResult.getPath()));
+
+        return results;
+    }
 }

@@ -5,7 +5,11 @@ import com.routing.spatial_routing_engine.model.Graph;
 import com.routing.spatial_routing_engine.model.Node;
 import com.routing.spatial_routing_engine.service.GraphService;
 import com.routing.spatial_routing_engine.service.RoutingService;
+import com.routing.spatial_routing_engine.model.BenchmarkResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
+
 
 
 import java.util.Map;
@@ -37,5 +41,11 @@ public class RoutingController {
     public DijkstraResult runAStar(@RequestParam String from, @RequestParam String to) {
         Graph graph = graphService.buildToyGraph();
         return routingService.aStar(graph, from, to);
+    }
+
+    @GetMapping("/benchmark")
+    public List<BenchmarkResult> runBenchmark(@RequestParam String from, @RequestParam String to) {
+        Graph graph = graphService.buildToyGraph();
+        return routingService.benchmark(graph, from, to);
     }
 }
