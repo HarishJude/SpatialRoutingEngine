@@ -7,6 +7,7 @@ import com.routing.spatial_routing_engine.service.GraphService;
 import com.routing.spatial_routing_engine.service.RoutingService;
 import com.routing.spatial_routing_engine.model.BenchmarkResult;
 import org.springframework.web.bind.annotation.*;
+import com.routing.spatial_routing_engine.service.GeoJsonImportService;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +21,12 @@ public class RoutingController {
 
     private final GraphService graphService;
     private final RoutingService routingService;
+    private final GeoJsonImportService importService;
 
-    public RoutingController(GraphService graphService, RoutingService routingService) {
+    public RoutingController(GraphService graphService, RoutingService routingService, GeoJsonImportService importService) {
         this.graphService = graphService;
         this.routingService = routingService;
+        this.importService = importService;
     }
 
     @GetMapping("/toy")
@@ -47,5 +50,10 @@ public class RoutingController {
     public List<BenchmarkResult> runBenchmark(@RequestParam String from, @RequestParam String to) {
         Graph graph = graphService.buildToyGraph();
         return routingService.benchmark(graph, from, to);
+    }
+
+    @PostMapping("/import")
+    public String importRoads() throws Exception {
+        return importService.importFromClasspath("data/roads.geojson");
     }
 }
