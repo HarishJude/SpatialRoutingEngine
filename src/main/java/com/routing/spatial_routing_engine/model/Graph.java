@@ -21,4 +21,8 @@ public class Graph {
     }
 
     public Map<String, Node> getNodes() { return nodes; }
+
+    public void addDirectedEdge(String fromId, String toId, double weight) {
+        adjacencyList.get(fromId).add(new Edge(toId, weight));
+    }
 }

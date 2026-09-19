@@ -56,4 +56,22 @@ public class RoutingController {
     public String importRoads() throws Exception {
         return importService.importFromClasspath("data/roads.geojson");
     }
+
+    @GetMapping("/real/dijkstra")
+    public DijkstraResult runRealDijkstra(@RequestParam String from, @RequestParam String to) {
+        Graph graph = graphService.buildRealGraph();
+        return routingService.dijkstra(graph, from, to);
+    }
+
+    @GetMapping("/real/astar")
+    public DijkstraResult runRealAStar(@RequestParam String from, @RequestParam String to) {
+        Graph graph = graphService.buildRealGraph();
+        return routingService.aStar(graph, from, to);
+    }
+
+    @GetMapping("/real/benchmark")
+    public List<BenchmarkResult> runRealBenchmark(@RequestParam String from, @RequestParam String to) {
+        Graph graph = graphService.buildRealGraph();
+        return routingService.benchmark(graph, from, to);
+    }
 }
