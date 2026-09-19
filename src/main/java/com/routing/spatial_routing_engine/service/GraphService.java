@@ -7,6 +7,9 @@ import com.routing.spatial_routing_engine.model.RoadNode;
 import com.routing.spatial_routing_engine.repository.RoadEdgeRepository;
 import com.routing.spatial_routing_engine.repository.RoadNodeRepository;
 import org.springframework.stereotype.Service;
+import com.routing.spatial_routing_engine.util.Quadtree;
+import com.routing.spatial_routing_engine.model.Point;
+import com.routing.spatial_routing_engine.model.BoundingBox;
 
 @Service
 public class GraphService {
@@ -49,5 +52,17 @@ public class GraphService {
         }
 
         return graph;
+    }
+
+    public Quadtree buildQuadtree() {
+        // Colombo-area bounding box — wide enough to cover your imported data with margin
+        BoundingBox worldBounds = new BoundingBox(6.80, 7.00, 79.80, 79.95);
+        Quadtree tree = new Quadtree(worldBounds);
+
+        for (RoadNode rn : nodeRepository.findAll()) {
+            tree.insert(new Point(rn.getId(), rn.getLatitude(), rn.getLongitude()));
+        }
+
+        return tree;
     }
 }

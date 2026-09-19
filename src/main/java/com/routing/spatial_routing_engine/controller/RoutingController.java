@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import com.routing.spatial_routing_engine.service.GeoJsonImportService;
 import java.util.List;
 import java.util.Map;
+import com.routing.spatial_routing_engine.util.Quadtree;
+import com.routing.spatial_routing_engine.model.Point;
+import com.routing.spatial_routing_engine.model.BoundingBox;
+import com.routing.spatial_routing_engine.model.RangeQueryResult;
 
 
 
@@ -73,5 +77,17 @@ public class RoutingController {
     public List<BenchmarkResult> runRealBenchmark(@RequestParam String from, @RequestParam String to) {
         Graph graph = graphService.buildRealGraph();
         return routingService.benchmark(graph, from, to);
+    }
+
+    @GetMapping("/spatial/range")
+    public RangeQueryResult queryRange(
+            @RequestParam double minLat, @RequestParam double maxLat,
+            @RequestParam double minLon, @RequestParam double maxLon) {
+
+        Quadtree tree = graphService.buildQuadtree();
+        BoundingBox range = new BoundingBox(minLat, maxLat, minLon, maxLon);
+        List<Point> results = tree.queryRange(range);
+
+        return new RangeQueryResult(results.size(), results);
     }
 }
