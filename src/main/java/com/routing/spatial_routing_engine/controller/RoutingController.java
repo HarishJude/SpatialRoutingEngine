@@ -14,6 +14,7 @@ import com.routing.spatial_routing_engine.util.Quadtree;
 import com.routing.spatial_routing_engine.model.Point;
 import com.routing.spatial_routing_engine.model.BoundingBox;
 import com.routing.spatial_routing_engine.model.RangeQueryResult;
+import java.util.HashMap;
 
 
 
@@ -89,5 +90,29 @@ public class RoutingController {
         List<Point> results = tree.queryRange(range);
 
         return new RangeQueryResult(results.size(), results);
+    }
+
+    @GetMapping("/spatial/benchmark")
+    public Map<String, Object> spatialBenchmark(
+            @RequestParam double minLat, @RequestParam double maxLat,
+            @RequestParam double minLon, @RequestParam double maxLon) {
+
+        BoundingBox range = new BoundingBox(minLat, maxLat, minLon, maxLon);
+
+        long startBrute = System.nanoTime();
+        List<Point> bruteResults = graphService.bruteForceRange(range);
+        long bruteTime = System.nanoTime() - startBrute;
+
+        long startTree = System.nanoTime();
+        Quadtree tree = graphService.buildQuadtree();
+        List<Point> treeResults = tree.queryRange(range);
+        long treeTime = System.nanoTime() - startTree;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("bruteForceCount", bruteResults.size());
+        result.put("bruteForceTimeMs", bruteTime / 1_000_000.0);
+        result.put("quadtreeCount", treeResults.size());
+        result.put("quadtreeTimeMs", treeTime / 1_000_000.0);
+        return result;
     }
 }

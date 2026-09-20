@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.routing.spatial_routing_engine.util.Quadtree;
 import com.routing.spatial_routing_engine.model.Point;
 import com.routing.spatial_routing_engine.model.BoundingBox;
+import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class GraphService {
@@ -64,5 +66,16 @@ public class GraphService {
         }
 
         return tree;
+    }
+
+    public List<Point> bruteForceRange(BoundingBox range) {
+        List<Point> results = new ArrayList<>();
+        for (RoadNode rn : nodeRepository.findAll()) {
+            Point p = new Point(rn.getId(), rn.getLatitude(), rn.getLongitude());
+            if (range.contains(p)) {
+                results.add(p);
+            }
+        }
+        return results;
     }
 }
