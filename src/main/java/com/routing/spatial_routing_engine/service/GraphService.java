@@ -12,6 +12,7 @@ import com.routing.spatial_routing_engine.model.Point;
 import com.routing.spatial_routing_engine.model.BoundingBox;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 @Service
 public class GraphService {
@@ -77,5 +78,20 @@ public class GraphService {
             }
         }
         return results;
+    }
+
+    public Quadtree buildDriverQuadtree(int driverCount) {
+        BoundingBox worldBounds = new BoundingBox(6.80, 7.00, 79.80, 79.95);
+        Quadtree tree = new Quadtree(worldBounds);
+
+        List<RoadNode> allNodes = nodeRepository.findAll();
+        Random random = new Random();
+
+        for (int i = 0; i < driverCount; i++) {
+            RoadNode randomNode = allNodes.get(random.nextInt(allNodes.size()));
+            tree.insert(new Point("driver-" + i, randomNode.getLatitude(), randomNode.getLongitude()));
+        }
+
+        return tree;
     }
 }

@@ -115,4 +115,18 @@ public class RoutingController {
         result.put("quadtreeTimeMs", treeTime / 1_000_000.0);
         return result;
     }
+
+    @GetMapping("/drivers/nearby")
+    public List<Point> nearbyDrivers(
+            @RequestParam double lat, @RequestParam double lon,
+            @RequestParam(defaultValue = "5.0") double radiusKm) {
+        Quadtree drivers = graphService.buildDriverQuadtree(200); // 200 simulated drivers
+        return routingService.findWithinRadius(drivers, lat, lon, radiusKm);
+    }
+
+    @GetMapping("/drivers/nearest")
+    public Point nearestDriver(@RequestParam double lat, @RequestParam double lon) {
+        Quadtree drivers = graphService.buildDriverQuadtree(200);
+        return routingService.findNearest(drivers, lat, lon, 10.0); // expand search radius if needed
+    }
 }

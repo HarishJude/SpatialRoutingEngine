@@ -4,6 +4,7 @@ import com.routing.spatial_routing_engine.model.*;
 import org.springframework.stereotype.Service;
 import com.routing.spatial_routing_engine.util.HaversineUtil;
 import java.util.*;
+import com.routing.spatial_routing_engine.util.Quadtree;
 
 @Service
 public class RoutingService {
@@ -130,5 +131,46 @@ public class RoutingService {
                 aStarResult.getTotalCost(), aStarResult.getPath()));
 
         return results;
+    }
+
+    public List<Point> findWithinRadius(Quadtree tree, double centerLat, double centerLon, double radiusKm) {
+
+        double latDelta = radiusKm / 111.0;
+        double lonDelta = radiusKm / (111.0 * Math.cos(Math.toRadians(centerLat)));
+
+        BoundingBox roughBox = new BoundingBox(
+                centerLat - latDelta, centerLat + latDelta,
+                centerLon - lonDelta, centerLon + lonDelta
+        );
+
+        List<Point> candidates = tree.queryRange(roughBox);
+
+
+        List<Point> withinRadius = new ArrayList<>();
+        for (Point p : candidates) {
+            double dist = HaversineUtil.distance(centerLat, centerLon, p.getLatitude(), p.getLongitude());
+            if (dist <= radiusKm) {
+                withinRadius.add(p);
+            }
+        }
+
+        return withinRadius;
+    }
+
+    public Point findNearest(Quadtree tree, double centerLat, double centerLon, double searchRadiusKm) {
+        List<Point> nearby = findWithinRadius(tree, centerLat, centerLon, searchRadiusKm);
+
+        Point nearest = null;
+        double minDist = Double.MAX_VALUE;
+
+        for (Point p : nearby) {
+            double dist = HaversineUtil.distance(centerLat, centerLon, p.getLatitude(), p.getLongitude());
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = p;
+            }
+        }
+
+        return nearest;
     }
 }
